@@ -1,33 +1,32 @@
-// ─────────────────────────────────────────────────────────────
-// Tout le contenu du portfolio se remplit ici.
-// Tant qu'un tableau est vide, la section affiche des emplacements
-// « à venir » pour garder la mise en page visible.
-// Les images vont dans /public (ex. public/dessins/portrait.jpg
-// devient "/dessins/portrait.jpg").
-// ─────────────────────────────────────────────────────────────
-
 export const profil = {
   prenom: "Feriel",
   nom: "Benatsi",
   titre: "Développeuse & designer",
-  etiquettes: ["Développeuse", "Designer"], // étiquettes au-dessus du titre de l'accueil
+  etiquettes: ["Développeuse", "Designer"],
   badge: {
     accroche: "Enchantée,",
     departement: "code, design & coups de crayon",
   },
   ville: "Île-de-France",
   email: "ferielbenatsi6@gmail.com",
-  photo: "", // ex. "/photo.png" : idéalement détourée (fond transparent) pour le badge
+  photo: "../public/me.png",
   aPropos: [
-    // "Premier paragraphe de présentation.",
-    // "Deuxième paragraphe.",
+    "Étudiante en Master 2 Informatique, parcours Science et Technologie du Logiciel à Sorbonne Université, je suis passionnée par le développement logiciel et la création de solutions innovantes. Je m'intéresse particulièrement au développement Full Stack, à l'architecture logicielle, au Cloud et à l'intelligence artificielle.Curieuse, créative et toujours en quête de nouveaux défis, j'aime transformer des idées en applications concrètes, performantes et bien conçues.",
   ],
 };
 
 export const liens = [
-  { nom: "LinkedIn", url: "", libelle: "" },
-  { nom: "GitHub", url: "https://github.com/FerielBenatsi", libelle: "FerielBenatsi" },
-  { nom: "Behance", url: "", libelle: "" },
+  {
+    nom: "LinkedIn",
+    url: "https://linkedin.com/in/feriel-benatsi-639136270",
+    libelle: "",
+  },
+  {
+    nom: "GitHub",
+    url: "https://github.com/FerielBenatsi",
+    libelle: "FerielBenatsi",
+  },
+  { nom: "Behance", url: "https://www.behance.net/benatsiferiel", libelle: "" },
 ];
 
 export const competences = [
