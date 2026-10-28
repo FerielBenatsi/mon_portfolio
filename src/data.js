@@ -9,7 +9,7 @@ export const profil = {
   },
   ville: "Île-de-France",
   email: "ferielbenatsi6@gmail.com",
-  photo: "./assets/me.png",
+  photo: "../src/assets/me.png",
   aPropos: [
     "Étudiante en Master 2 Informatique, parcours Science et Technologie du Logiciel à Sorbonne Université, je suis passionnée par le développement logiciel et la création de solutions innovantes. Je m'intéresse particulièrement au développement Full Stack, à l'architecture logicielle, au Cloud et à l'intelligence artificielle.Curieuse, créative et toujours en quête de nouveaux défis, j'aime transformer des idées en applications concrètes, performantes et bien conçues.",
   ],
