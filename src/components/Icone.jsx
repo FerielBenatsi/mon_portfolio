@@ -50,6 +50,13 @@ const TRACES = {
   ),
   plus: <path d="M12 5v14M5 12h14" />,
   retour: <path d="M14.5 6.5 9 12l5.5 5.5" />,
+  telecharger: (
+    <>
+      <path d="M12 4v11" />
+      <path d="M7.5 10.5 12 15l4.5-4.5" />
+      <path d="M5 19h14" />
+    </>
+  ),
 };
 
 export default function Icone({ nom }) {

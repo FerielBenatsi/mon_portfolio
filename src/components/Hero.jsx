@@ -25,7 +25,10 @@ export default function Hero() {
       <div className="hero__inner">
         <ul className="etiquettes" aria-label="En bref">
           {etiquettes.map((texte, i) => (
-            <li key={texte} className={`etiquette etiquette--${COULEURS_ETIQUETTES[i % COULEURS_ETIQUETTES.length]}`}>
+            <li
+              key={texte}
+              className={`etiquette etiquette--${COULEURS_ETIQUETTES[i % COULEURS_ETIQUETTES.length]}`}
+            >
               {texte}
             </li>
           ))}
@@ -38,7 +41,19 @@ export default function Hero() {
         </h1>
 
         <div className="hero__actions">
-          
+          <Link className="bouton bouton--rose" to="/#projets">
+            Voir mes projets
+          </Link>
+          {profil.cv && (
+            <a
+              className="bouton bouton--contour"
+              href={profil.cv}
+              download="CV_Feriel_Benatsi.pdf"
+            >
+              <Icone nom="telecharger" />
+              Télécharger mon CV
+            </a>
+          )}
         </div>
       </div>
     </section>

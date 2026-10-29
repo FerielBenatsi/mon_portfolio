@@ -1,12 +1,73 @@
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import EnTetePage from "../components/EnTetePage";
+import Icone from "../components/Icone";
 import { trouverProjet } from "../outils";
 
 const RETOUR_PROJETS = { to: "/projets", label: "Tous les projets" };
 
+// Visionneuse plein écran : s'ouvre sur une image, se ferme au clic à côté,
+// sur la croix ou avec la touche Échap.
+function Visionneuse({ apercu, onFermer }) {
+  const dialogue = useRef(null);
+
+  // Ouvre ou ferme la fenêtre selon l'image choisie, et bloque le défilement derrière.
+  useEffect(() => {
+    const d = dialogue.current;
+    if (!d) return undefined;
+    if (apercu && !d.open) {
+      d.showModal();
+      document.body.style.overflow = "hidden";
+    } else if (!apercu && d.open) {
+      d.close();
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [apercu]);
+
+  // Fermeture par la touche Échap (gérée par le navigateur).
+  useEffect(() => {
+    const d = dialogue.current;
+    if (!d) return undefined;
+    d.addEventListener("close", onFermer);
+    return () => d.removeEventListener("close", onFermer);
+  }, [onFermer]);
+
+  return (
+    <dialog
+      ref={dialogue}
+      className="visionneuse"
+      aria-label={apercu?.alt ?? "Capture d'écran"}
+      onClick={(e) => {
+        // Un clic n'importe où sauf sur l'image ferme la fenêtre.
+        if (e.target.tagName !== "IMG") onFermer();
+      }}
+    >
+      {apercu && (
+        <>
+          <button
+            type="button"
+            className="visionneuse__fermer"
+            aria-label="Fermer"
+          >
+            <Icone nom="plus" />
+          </button>
+          <img
+            className="visionneuse__image"
+            src={apercu.src}
+            alt={apercu.alt}
+          />
+        </>
+      )}
+    </dialog>
+  );
+}
+
 export default function PageProjet() {
   const { slug } = useParams();
   const projet = trouverProjet(slug);
+  const [apercu, setApercu] = useState(null);
 
   if (!projet) {
     return (
@@ -30,7 +91,9 @@ export default function PageProjet() {
     { terme: "Équipe", valeur: projet.equipe },
   ].filter((ligne) => ligne.valeur);
   const captures = projet.captures ?? [];
-  const aDesLiens = projet.demo || projet.github || projet.exemple;
+  const aDesLiens =
+    projet.demo || projet.github || projet.behance || projet.exemple;
+  const altCouverture = `Aperçu de ${projet.titre}`;
 
   return (
     <article className="page projet-detail">
@@ -46,19 +109,43 @@ export default function PageProjet() {
         <div className="projet-detail__actions">
           {projet.exemple ? (
             <>
-              <span className="bouton bouton--rose est-inactif">Voir en ligne</span>
-              <span className="bouton bouton--contour est-inactif">Code source</span>
+              <span className="bouton bouton--rose est-inactif">
+                Voir en ligne
+              </span>
+              <span className="bouton bouton--contour est-inactif">
+                Code source
+              </span>
             </>
           ) : (
             <>
               {projet.demo && (
-                <a className="bouton bouton--rose" href={projet.demo} target="_blank" rel="noreferrer">
+                <a
+                  className="bouton bouton--rose"
+                  href={projet.demo}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   Voir en ligne
                 </a>
               )}
               {projet.github && (
-                <a className="bouton bouton--contour" href={projet.github} target="_blank" rel="noreferrer">
+                <a
+                  className="bouton bouton--contour"
+                  href={projet.github}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   Code source
+                </a>
+              )}
+              {projet.behance && (
+                <a
+                  className="bouton bouton--contour"
+                  href={projet.behance}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Voir sur Behance
                 </a>
               )}
             </>
@@ -66,13 +153,36 @@ export default function PageProjet() {
         </div>
       )}
 
-      <div className="projet-detail__couverture">
-        {projet.image ? (
-          <img src={projet.image} alt={`Aperçu de ${projet.titre}`} />
-        ) : (
-          <span className="vide-etiquette">Image de couverture</span>
-        )}
-      </div>
+      {(projet.image || projet.exemple) && (
+        <div
+          className="projet-detail__couverture"
+          style={
+            projet.imageFond ? { background: projet.imageFond } : undefined
+          }
+        >
+          {projet.image ? (
+            <button
+              type="button"
+              className="zoomable"
+              aria-label={`Agrandir : ${altCouverture}`}
+              onClick={() =>
+                setApercu({ src: projet.image, alt: altCouverture })
+              }
+            >
+              <img
+                src={projet.image}
+                alt={altCouverture}
+                style={{
+                  objectFit: projet.imageAjustement ?? "cover",
+                  objectPosition: projet.imagePosition ?? "center",
+                }}
+              />
+            </button>
+          ) : (
+            <span className="vide-etiquette">Image de couverture</span>
+          )}
+        </div>
+      )}
 
       <div className="projet-detail__corps">
         <div className="projet-detail__texte">
@@ -133,12 +243,23 @@ export default function PageProjet() {
           <h2>Captures d'écran</h2>
           <div className="captures">
             {captures.length > 0
-              ? captures.map((src, i) => (
-                  <figure className="capture" key={src}>
-                    <img src={src} alt={`${projet.titre}, capture ${i + 1}`} loading="lazy" />
-                  </figure>
-                ))
-              : [1, 2].map((n) => <div className="capture capture--vide" key={n} />)}
+              ? captures.map((src, i) => {
+                  const alt = `${projet.titre}, capture ${i + 1}`;
+                  return (
+                    <button
+                      type="button"
+                      className="capture zoomable"
+                      key={src}
+                      aria-label={`Agrandir : ${alt}`}
+                      onClick={() => setApercu({ src, alt })}
+                    >
+                      <img src={src} alt={alt} loading="lazy" />
+                    </button>
+                  );
+                })
+              : [1, 2].map((n) => (
+                  <div className="capture capture--vide" key={n} />
+                ))}
           </div>
         </section>
       )}
@@ -148,6 +269,8 @@ export default function PageProjet() {
           Voir tous les projets
         </Link>
       </div>
+
+      <Visionneuse apercu={apercu} onFermer={() => setApercu(null)} />
     </article>
   );
 }
